@@ -1,16 +1,29 @@
-# Container image for mutual TLS access to to Docker Daemon
-A secure, easier-to-use alternative to docker daemon's built-in mutual TLS settings. Mutual TLS from a client is terminated at the container then proxied to a docker daemon via a bind-mounted docker socket. 
+# Container image for Mutual TLS access to Docker Daemon
+A secure, easier-to-use alternative to enabling Docker daemon's [built-in mutual TLS settings](https://docs.docker.com/engine/security/https) that works on default daemon installations.
+
+Mutual TLS connections from docker clients are securely terminated at a container then proxied to a docker daemon via a bind-mounted docker socket. 
 
 ## Requirements
-* Docker daemon with accessible IP
-* Hostname for your docker daemon IP (either DNS name or /etc/host entry)
+* Docker daemon with default settings (Linux or Windows)
+  * Note: daemon does not need to be listing on network port, only needs default socket listener
+* Hostname for your docker daemon host's IP (either DNS name or /etc/host entry)
   * Note: `host.docker.internal` may already be present on [Docker Desktop](https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds) 
 
 ## Usage
+* Build the image locally on a Docker daemon
+    ```bash
+    # Linux
+    docker build --tag mtlssocketproxy -f Dockerfile.linux .
+
+    # Windows
+    docker build --tag mtlssocketproxy -f Dockerfile.windows .
+    ```
+    * Note: no certs are included in the image. It will not be runnable without the final steps below.
+
 * Generate `ca`, `server`, and `client` certs (official [instructions](https://docs.docker.com/engine/security/https/#create-a-ca-server-and-client-keys-with-openssl))
     * Self-signed example
     ```bash
-    HOST=host.docker.internal
+    HOST=host.docker.internal  # set to your hostname
   
     mkdir -p certs
     pushd certs
@@ -34,28 +47,20 @@ A secure, easier-to-use alternative to docker daemon's built-in mutual TLS setti
     popd
     ```
 
-* Build the image on a local Docker daemon
+* Create a container, copy in certs add start the container on Docker daemon
     ```bash
     # Linux
-    docker build --tag tlssocketproxy -f Dockerfile.linux .
+    docker create --name mtlssocketproxy-ctr --restart unless-stopped --volume '/var/run/docker.sock:/var/run/docker.sock' --user root -p 23760:2376 mtlssocketproxy
+    docker cp certs mtlssocketproxy-ctr:/certs
+    docker start mtlssocketproxy-ctr
 
     # Windows
-    docker build --tag tlssocketproxy -f Dockerfile.windows .
+    docker create --name mtlssocketproxy-ctr --restart unless-stopped --volume '\\.\pipe\docker_engine:\\.\pipe\docker_engine' --user ContainerAdministrator -p 23760:2376 mtlssocketproxy
+    docker cp certs mtlssocketproxy-ctr:/certs
+    docker start mtlssocketproxy-ctr
     ```
 
-* Run the image on the to-be-secured Docker daemon
-    ```bash
-    # Linux
-    docker create --name tlssocketproxy-ctr --restart unless-stopped --volume '/var/run/docker.sock:/var/run/docker.sock' --user root -p 23760:2376 tlssocketproxy
-    docker cp certs tlssocketproxy-ctr:/certs
-    docker start tlssocketproxy-ctr
-
-    # Windows
-    docker create --name tlssocketproxy-ctr --restart unless-stopped --volume '\\.\pipe\docker_engine:\\.\pipe\docker_engine' --user ContainerAdministrator -p 23760:2376 tlssocketproxy
-    docker cp certs tlssocketproxy-ctr:/certs
-    docker start tlssocketproxy-ctr
+* Test the connection
     ```
-
-```
-docker --host tcp://host.docker.internal:23760 --tlsverify --tlscacert certs/ca.pem --tlscert certs/cert.pem --tlskey certs/key.pem ps
-```
+    docker --host tcp://host.docker.internal:23760 --tlsverify --tlscacert certs/ca.pem --tlscert certs/cert.pem --tlskey certs/key.pem ps
+    ```

@@ -1,0 +1,14 @@
+FROM golang:1.14-nanoserver-1809 AS builder
+
+WORKDIR /src
+
+COPY . .
+
+RUN go build -o dockerproxy.exe
+
+FROM mcr.microsoft.com/windows/nanoserver:1809
+
+COPY --from=builder /src/dockerproxy.exe dockerproxy.exe
+
+CMD ["-certPath", "c:/certs/server-cert.pem", "-keyPath", "c:/certs/server-key.pem", "-caPath", "c:/certs/ca.pem", "-listenAddr", ":2376"]
+ENTRYPOINT ["c:/dockerproxy.exe"]
