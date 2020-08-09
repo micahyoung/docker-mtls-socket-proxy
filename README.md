@@ -59,6 +59,7 @@ Mutual TLS connections from docker clients are securely terminated at a containe
     docker cp certs mtlssocketproxy-ctr:/certs
     docker start mtlssocketproxy-ctr
     ```
+    * Note: Docker volume could be used to populate `/certs` instead of copying.
 
 * Test the connection
     ```
