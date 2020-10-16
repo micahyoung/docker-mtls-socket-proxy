@@ -25,7 +25,7 @@ docker build --tag docker-mtls-socket-proxy -f Dockerfile.windows --build-arg os
 ```
 
 ### Generate a cert chain from scratch:
-This will write (or re-use) all client, server, ca certs to your local ~/.docker dir
+This will write (or re-use) all client, server, ca certs to your local `~/.docker/my-docker-host` dir
 
 #### Linux/MacOS
 ```bash
