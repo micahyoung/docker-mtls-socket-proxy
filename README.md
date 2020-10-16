@@ -61,7 +61,7 @@ docker run --detach `
 
 ```bash
 mkdir ~/.docker/my-docker-host
-ssh <my-docker-host or 10.1.2.3> tar -c -f- -C .docker cert.pem key.pem ca.pem | tar -x -f- -C ~/.docker/my-docker-host
+ssh <my-docker-host or 10.1.2.3> tar -c -f- -C .docker cert.pem key.pem ca.pem | tar -x -f- -C ~/.docker
 
 export DOCKER_HOST=tcp://<my-docker-host or 10.1.2.3>:2376
 export DOCKER_TLS_VERIFY=1
