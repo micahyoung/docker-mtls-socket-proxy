@@ -1,4 +1,5 @@
-FROM golang:1.14-nanoserver-1809 AS builder
+ARG os_tag
+FROM golang:1.14-nanoserver-${os_tag} AS builder
 
 WORKDIR /src
 
@@ -8,7 +9,20 @@ RUN go build -o dockerproxy.exe
 
 FROM mcr.microsoft.com/windows/nanoserver:1809
 
+USER ContainerAdministrator
+
+RUN curl.exe -L -o c:\openssl.zip https://indy.fulgan.com/SSL/Archive/Experimental/openssl-1.1.0h-x64-VC2017.zip  && \
+    tar -x -f c:\openssl.zip && cd openssl*\ && move * c:\windows\ && \
+    del c:\openssl.zip
+
 COPY --from=builder /src/dockerproxy.exe dockerproxy.exe
 
-CMD ["-certPath", "c:/certs/server-cert.pem", "-keyPath", "c:/certs/server-key.pem", "-caPath", "c:/certs/ca.pem", "-listenAddr", ":2376"]
+COPY openssl.cnf c:/windows/openssl.cnf
+
+ENV OPENSSL_CONF=c:\\windows\\openssl.cnf
+
+EXPOSE 2376
+
+CMD []
 ENTRYPOINT ["c:/dockerproxy.exe"]
+

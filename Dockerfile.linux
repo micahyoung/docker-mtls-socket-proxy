@@ -8,7 +8,15 @@ RUN go build -o dockerproxy
 
 FROM alpine
 
+USER root
+
+RUN apk add --no-cache openssl
+
 COPY --from=builder /src/dockerproxy dockerproxy
 
-CMD ["-certPath", "/certs/server-cert.pem", "-keyPath", "/certs/server-key.pem", "-caPath", "/certs/ca.pem", "-listenAddr", ":2376"]
+COPY openssl.cnf /etc/ssl/openssl.cnf
+
+EXPOSE 2376
+
+CMD []
 ENTRYPOINT ["/dockerproxy"]
