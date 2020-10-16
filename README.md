@@ -29,6 +29,8 @@ This will write (or re-use) all client, server, ca certs to your local `~/.docke
 
 #### Linux/MacOS
 ```bash
+mkdir $HOME/.docker/my-docker-host
+
 docker run --detach \
     --name tlsproxy \
     --publish 2376:2376 \
@@ -42,6 +44,8 @@ docker run --detach \
 
 # Windows
 ```powershell
+mkdir $env:USERPROFILE\.docker\my-docker-host
+
 docker run --detach `
     --name tlsproxy `
     --publish 2376:2376 `
