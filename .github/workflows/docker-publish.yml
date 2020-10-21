@@ -40,6 +40,9 @@ jobs:
               --restart=always \
               docker-mtls-socket-proxy
 
+          # wait for certs to be generated
+          sleep 30
+          
           # Test connection
           export DOCKER_HOST="tcp://localhost:23760"
           export DOCKER_TLS_VERIFY="1"
@@ -80,6 +83,9 @@ jobs:
               --volume \\.\pipe\docker_engine:\\.\pipe\docker_engine `
               --restart=always `
               docker-mtls-socket-proxy
+
+          # wait for certs to be generated
+          Start-Sleep 30
 
           # Test connection
           $env:DOCKER_HOST="tcp://localhost:23760"
