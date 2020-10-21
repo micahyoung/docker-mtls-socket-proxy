@@ -87,6 +87,8 @@ jobs:
               --restart always `
               docker-mtls-socket-proxy
 
+          Start-Process -NoNewWindow -FilePath docker -ArgumentList "logs -f tlsproxy"
+ 
           # wait for certs to be generated
           Start-Sleep 30
 
