@@ -37,13 +37,14 @@ jobs:
               --publish 23760:2376 \
               --volume $HOME/.docker:/certs \
               --volume /var/run/docker.sock:/var/run/docker.sock \
-              --restart=always \
+              --restart always \
+              --user $UID \
               docker-mtls-socket-proxy
 
           docker logs -f tlsproxy &
           
           # wait for certs to be generated
-          sleep 30
+          sleep 10
           
           # Test connection
           export DOCKER_HOST="tcp://localhost:23760"
@@ -83,7 +84,7 @@ jobs:
               --publish 23760:2376 `
               --volume $env:USERPROFILE\.docker:c:/certs `
               --volume \\.\pipe\docker_engine:\\.\pipe\docker_engine `
-              --restart=always `
+              --restart always `
               docker-mtls-socket-proxy
 
           # wait for certs to be generated
