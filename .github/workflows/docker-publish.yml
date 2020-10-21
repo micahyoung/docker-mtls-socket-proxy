@@ -30,23 +30,25 @@ jobs:
 
       - name: Test
         run: |
-          mkdir -p ~/.docker
+          mkdir -p $HOME/.docker
 
           docker run --detach \
               --name tlsproxy \
               --publish 23760:2376 \
-              --volume ~/.docker:/certs \
+              --volume $HOME/.docker:/certs \
               --volume /var/run/docker.sock:/var/run/docker.sock \
               --restart=always \
               docker-mtls-socket-proxy
 
+          docker logs -f tlsproxy &
+          
           # wait for certs to be generated
           sleep 30
           
           # Test connection
           export DOCKER_HOST="tcp://localhost:23760"
           export DOCKER_TLS_VERIFY="1"
-          export DOCKER_CERT_PATH="~/.docker"
+          export DOCKER_CERT_PATH="$HOME/.docker"
 
           docker info
 
