@@ -89,6 +89,11 @@ func run(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath, caPath, c
 
 // ref: https://medium.com/buildpacks/pack-with-a-remote-docker-daemon-41aab804b839
 func generateCerts(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath, caPath, caKeyPath, hostname string) error {
+	serverCSRPath := filepath.Join(filepath.Dir(serverCertPath), "server.csr")
+	serverExtPath := filepath.Join(filepath.Dir(serverCertPath), "extfile.cnf")
+	clientCSRPath := filepath.Join(filepath.Dir(clientCertPath), "client.csr")
+	clientExtPath := filepath.Join(filepath.Dir(clientCertPath), "extfile-client.cnf")
+
 	// Certificate Authority cert
 	if _, err := os.Stat(caPath); os.IsNotExist(err) {
 		log.Printf("generating ca cert %s %s\n", caPath, caKeyPath)
@@ -104,7 +109,7 @@ func generateCerts(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath,
 
 	if _, err := os.Stat(serverCertPath); os.IsNotExist(err) {
 		log.Printf("generating server cert %s %s\n", serverCertPath, serverKeyPath)
-		cmd := exec.Command("openssl", "req", "-new", "-newkey", "rsa:4096", "-nodes", "-subj", fmt.Sprintf("/CN=%s", hostname), "-out", "server.csr", "-keyout", serverKeyPath)
+		cmd := exec.Command("openssl", "req", "-new", "-newkey", "rsa:4096", "-nodes", "-subj", fmt.Sprintf("/CN=%s", hostname), "-out", serverCSRPath, "-keyout", serverKeyPath)
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			log.Printf("%s\n", out)
@@ -118,11 +123,11 @@ func generateCerts(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath,
 			ipAddress = hostname
 		}
 
-		if err := ioutil.WriteFile("extfile.cnf", []byte(fmt.Sprintf("subjectAltName = DNS:%s,IP:%s\nextendedKeyUsage = serverAuth\n", hostname, ipAddress)), 0666); err != nil {
+		if err := ioutil.WriteFile(serverExtPath, []byte(fmt.Sprintf("subjectAltName = DNS:%s,IP:%s\nextendedKeyUsage = serverAuth\n", hostname, ipAddress)), 0666); err != nil {
 			return err
 		}
 
-		cmd = exec.Command("openssl", "x509", "-req", "-days", "365", "-sha256", "-extfile", "extfile.cnf", "-in", "server.csr", "-CA", caPath, "-CAkey", caKeyPath, "-CAcreateserial", "-out", serverCertPath)
+		cmd = exec.Command("openssl", "x509", "-req", "-days", "365", "-sha256", "-extfile", serverExtPath, "-in", serverCSRPath, "-CA", caPath, "-CAkey", caKeyPath, "-CAcreateserial", "-out", serverCertPath)
 		out, err = cmd.CombinedOutput()
 		if err != nil {
 			log.Printf("%s\n", out)
@@ -134,7 +139,7 @@ func generateCerts(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath,
 
 	if _, err := os.Stat(clientCertPath); os.IsNotExist(err) {
 		log.Printf("generating client cert %s %s\n", clientCertPath, clientKeyPath)
-		cmd := exec.Command("openssl", "req", "-subj", "/CN=client", "-new", "-newkey", "rsa:4096", "-nodes", "-out", "client.csr", "-keyout", clientKeyPath)
+		cmd := exec.Command("openssl", "req", "-subj", "/CN=client", "-new", "-newkey", "rsa:4096", "-nodes", "-out", clientCSRPath, "-keyout", clientKeyPath)
 
 		out, err := cmd.CombinedOutput()
 		if err != nil {
@@ -144,11 +149,11 @@ func generateCerts(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath,
 		}
 		log.Printf("%s\n", out)
 
-		if err := ioutil.WriteFile("extfile-client.cnf", []byte("extendedKeyUsage = clientAuth\n"), 0666); err != nil {
+		if err := ioutil.WriteFile(clientExtPath, []byte("extendedKeyUsage = clientAuth\n"), 0666); err != nil {
 			return err
 		}
 
-		cmd = exec.Command("openssl", "x509", "-req", "-days", "365", "-sha256", "-extfile", "extfile-client.cnf", "-in", "client.csr", "-CA", caPath, "-CAkey", caKeyPath, "-CAcreateserial", "-out", clientCertPath)
+		cmd = exec.Command("openssl", "x509", "-req", "-days", "365", "-sha256", "-extfile", clientExtPath, "-in", clientCSRPath, "-CA", caPath, "-CAkey", caKeyPath, "-CAcreateserial", "-out", clientCertPath)
 		out, err = cmd.CombinedOutput()
 		if err != nil {
 			log.Printf("%s\n", out)
@@ -158,10 +163,10 @@ func generateCerts(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath,
 		log.Printf("%s\n", out)
 	}
 
-	os.Remove("client.csr")
-	os.Remove("server.csr")
-	os.Remove("extfile.cnf")
-	os.Remove("extfile-client.cnf")
+	os.Remove(clientCSRPath)
+	os.Remove(serverCSRPath)
+	os.Remove(serverExtPath)
+	os.Remove(clientExtPath)
 
 	return nil
 }
