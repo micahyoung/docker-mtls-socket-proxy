@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"text/template"
 )
 
@@ -112,7 +113,12 @@ func generateCerts(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath,
 		}
 		log.Printf("%s\n", out)
 
-		if err := ioutil.WriteFile("extfile.cnf", []byte(fmt.Sprintf("subjectAltName = DNS:%s,IP:%s\nextendedKeyUsage = serverAuth\n", hostname, hostname)), 0666); err != nil {
+		ipAddress := "127.0.0.1"
+		if ok, err := regexp.MatchString(`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$`, hostname); (err == nil) && ok {
+			ipAddress = hostname
+		}
+
+		if err := ioutil.WriteFile("extfile.cnf", []byte(fmt.Sprintf("subjectAltName = DNS:%s,IP:%s\nextendedKeyUsage = serverAuth\n", hostname, ipAddress)), 0666); err != nil {
 			return err
 		}
 
