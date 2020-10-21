@@ -30,34 +30,22 @@ jobs:
 
       - name: Test
         run: |
-          HOSTNAME=localhost
+          mkdir -p ~/.docker
 
-          mkdir certs
-          pushd certs
-
-          # CA
-          openssl req -new -x509 -days 365 -sha256 -subj "/C=ZZ/ST=ZZ/L=ZZ/O=ZZ/CN=${HOSTNAME}" -out ca.pem -keyout ca-key.pem -newkey rsa:4096 -nodes
-
-          # Server
-          openssl req -subj "/CN=$HOSTNAME" -sha256 -new -out server.csr -keyout server-key.pem -newkey rsa:4096 -nodes
-          echo subjectAltName = DNS:$HOSTNAME > extfile.cnf
-          echo extendedKeyUsage = serverAuth >> extfile.cnf
-          openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out server-cert.pem -extfile extfile.cnf
-
-          # Client
-          openssl req -subj '/CN=client' -new -out client.csr -keyout key.pem -newkey rsa:4096 -nodes
-          echo extendedKeyUsage = clientAuth > extfile-client.cnf
-          openssl x509 -req -days 365 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out cert.pem -extfile extfile-client.cnf
-
-          popd
-
-          # Start container
-          docker create --name mtlssocketproxy-ctr --restart unless-stopped --volume '/var/run/docker.sock:/var/run/docker.sock' --user root -p 23760:2376 ${IMAGE_NAME}
-          docker cp certs mtlssocketproxy-ctr:/certs
-          docker start mtlssocketproxy-ctr
+          docker run --detach \
+              --name tlsproxy \
+              --publish 23760:2376 \
+              --volume ~/.docker:/certs \
+              --volume /var/run/docker.sock:/var/run/docker.sock \
+              --restart=always \
+              docker-mtls-socket-proxy
 
           # Test connection
-          docker --host tcp://${HOSTNAME}:23760 --tlsverify --tlscacert certs/ca.pem --tlscert certs/cert.pem --tlskey certs/key.pem info
+          export DOCKER_HOST="tcp://localhost:23760"
+          export DOCKER_TLS_VERIFY="1"
+          export DOCKER_CERT_PATH="~/.docker"
+
+          docker info
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
@@ -79,36 +67,26 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build image
-        run: docker build . --file Dockerfile.windows --tag ${env:IMAGE_NAME}
+        run: docker build . --file Dockerfile.windows --tag ${env:IMAGE_NAME} --build-arg os_tag=1809
 
       - name: Test
         run: |
-          mkdir certs
-          pushd certs
-
-          # CA
-          openssl req -new -x509 -days 365 -sha256 -subj "/C=ZZ/ST=ZZ/L=ZZ/O=ZZ/CN=${env:COMPUTERNAME}" -out ca.pem -keyout ca-key.pem -newkey rsa:4096 -nodes
-
-          # Server
-          openssl req -subj "/CN=${env:COMPUTERNAME}" -sha256 -new -out server.csr -keyout server-key.pem -newkey rsa:4096 -nodes
-          echo "subjectAltName = DNS:${env:COMPUTERNAME}" | Out-File extfile.cnf -Encoding ASCII
-          echo "extendedKeyUsage = serverAuth" | Out-File sextfile.cnf -Encoding ASCII -Append
-          openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out server-cert.pem -extfile extfile.cnf
-
-          # Client
-          openssl req -subj '/CN=client' -new -out client.csr -keyout key.pem -newkey rsa:4096 -nodes
-          echo "extendedKeyUsage = clientAuth" | Out-File extfile-client.cnf -Encoding ASCII
-          openssl x509 -req -days 365 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out cert.pem -extfile extfile-client.cnf
-
-          popd
-
-          # Start container
-          docker create --name mtlssocketproxy-ctr --restart unless-stopped --volume '\\.\pipe\docker_engine:\\.\pipe\docker_engine' --user ContainerAdministrator -p 23760:2376 ${env:IMAGE_NAME}
-          docker cp certs mtlssocketproxy-ctr:/certs
-          docker start mtlssocketproxy-ctr
+          mkdir $env:USERPROFILE\.docker
+          
+          docker run --detach `
+              --name tlsproxy `
+              --publish 23760:2376 `
+              --volume $env:USERPROFILE\.docker:c:/certs `
+              --volume \\.\pipe\docker_engine:\\.\pipe\docker_engine `
+              --restart=always `
+              docker-mtls-socket-proxy
 
           # Test connection
-          docker --host tcp://${env:COMPUTERNAME}:23760 --tlsverify --tlscacert certs\ca.pem --tlscert certs\cert.pem --tlskey certs\key.pem info
+          $env:DOCKER_HOST="tcp://localhost:23760"
+          $env:DOCKER_TLS_VERIFY="1"
+          $env:DOCKER_CERT_PATH="$env:USERPROFILE\.docker"
+          
+          docker info
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
