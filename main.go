@@ -163,13 +163,35 @@ func generateCerts(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath,
 		log.Printf("%s\n", out)
 	}
 
-	os.Remove(clientCSRPath)
-	os.Remove(serverCSRPath)
-	os.Remove(serverExtPath)
-	os.Remove(clientExtPath)
+	if err := removeAll(clientCSRPath, serverCSRPath, serverExtPath, clientExtPath); err != nil {
+		return err
+	}
+
+	if err := allowAll(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath, caPath, caKeyPath); err != nil {
+		return err
+	}
 
 	return nil
 }
+
+func removeAll(paths ...string) error {
+	for _, path := range paths {
+		if err := os.Remove(path); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func allowAll(paths ...string) error {
+	for _, path := range paths {
+		if err := os.Chmod(path, 0666); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 
 func clientCertCommand(hostname, clientCertPath, clientKeyPath, caPath string) (string, error) {
 	var args []interface{}
