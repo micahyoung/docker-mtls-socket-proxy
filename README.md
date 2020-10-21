@@ -70,9 +70,8 @@ docker logs tlsproxy
 ##### END COPY #####
 ```
 
-* On client, execute clipboard
-
-Syntax check and execute
+* On client, Syntax check and execute clipboard contents
+    
 ```bash
 # MacOS 
 pbpaste | wc -l  # should be ~130 depending on random key lengths
