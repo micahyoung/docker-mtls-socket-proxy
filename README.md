@@ -24,48 +24,68 @@ docker build --tag docker-mtls-socket-proxy -f Dockerfile.linux .
 docker build --tag docker-mtls-socket-proxy -f Dockerfile.windows --build-arg os_tag=1809 .
 ```
 
-### Generate a cert chain from scratch:
-This will write (or re-use) all client, server, ca certs to your local `~/.docker/my-docker-host` dir
+### Start your container
+This will start the process and generate self-signed certificates (or re-use previously generated ones). 
 
 #### Linux/MacOS
 ```bash
-mkdir $HOME/.docker/my-docker-host
+hostname=<"my-docker-host" or "10.1.2.3">
 
 docker run --detach \
     --name tlsproxy \
     --publish 2376:2376 \
-    --volume $HOME/.docker/my-docker-host:/certs \
+    --volume tlsproxy-certs:/certs \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --restart=always \
     docker-mtls-socket-proxy \
-        -hostname my-docker-host \
-        -ipAddress 10.1.2.3
+        -hostname $hostname
 ```
 
 # Windows
 ```powershell
-mkdir $env:USERPROFILE\.docker\my-docker-host
+$hostname=<"my-docker-host" or "10.1.2.3">
 
 docker run --detach `
     --name tlsproxy `
     --publish 2376:2376 `
-    --volume $env:USERPROFILE\.docker\my-docker-host:c:/certs `
+    --volume tlsproxy-certs:c:/certs `
     --volume \\.\pipe\docker_engine:\\.\pipe\docker_engine `
     --restart=always `
     docker-mtls-socket-proxy `
-        -hostname my-docker-host `
-        -ipAddress 10.1.2.3
+        -hostname $hostname
 ```
 
-### Copy client credentials to your remote clients
+### Copy client credentials to your client
 
+* On Docker host, print the logs from the container
+```
+docker logs tlsproxy
+```
+
+* On Docker host, copy/paste all output between `BEGIN COPY` and `END COPY`
+
+```
+##### BEGIN COPY #####
+<highlight and copy these 127 lines>
+##### END COPY #####
+```
+
+* On client, execute clipboard
+
+Syntax check and execute
 ```bash
-mkdir ~/.docker/my-docker-host
-ssh <my-docker-host or 10.1.2.3> tar -c -f- -C .docker my-docker-host | tar -x -f- -C ~/.docker
+# MacOS 
+pbpaste | wc -l  # should be ~130 depending on random key lengths
+pbpaste | bash
 
-export DOCKER_HOST=tcp://<my-docker-host or 10.1.2.3>:2376
-export DOCKER_TLS_VERIFY=1
-export DOCKER_CERT_PATH=~/.docker/my-docker-host
-
-docker info
+# Linux
+xclip -o -selection clipboard | wc -l
+xclip -o -selection clipboard | bash
 ```
+
+  * Note: You can also copy paste data just each certs/key from the logs if preferred
+    * ~/.docker/[hostname]/cert.pem
+    * ~/.docker/[hostname]/key.pem
+    * ~/.docker/[hostname]/ca.pem
+
+    
