@@ -8,14 +8,13 @@ Mutual TLS connections from docker clients are securely terminated at a containe
 ## Requirements
 * Docker daemon with default settings (Linux or Windows)
   * Note: daemon does not need to be listing on network port, only needs default socket listener
-* Hostname for your docker daemon host's IP (either DNS name or /etc/host entry)
-  * Note: `host.docker.internal` may already be present on [Docker Desktop](https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds) 
+* Hostname or IP for your docker daemon host machine
 
 ## Usage
 
 ### Build the image locally on a Docker daemon
 #### Linux/MacOS
-Note: no certs are included in the image. It will not be runnable without the final steps below.
+Note: no certs are included in the image. It generates self-signed certs on container start.
 
 ```bash
 docker build --tag docker-mtls-socket-proxy -f Dockerfile.linux .
@@ -55,6 +54,11 @@ docker run --detach `
     --restart=always `
     docker-mtls-socket-proxy `
         -hostname $hostname
+```
+
+Note: if you generate incorrect certs, you must remove the volume or they will not regenerate:
+```
+docker volume rm tlsproxy-certs
 ```
 
 ### Copy client credentials to your client
