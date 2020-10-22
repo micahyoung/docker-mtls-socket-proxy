@@ -5,7 +5,7 @@
   <title>Layer 1</title>
   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="327.044296" y="14" width="458.455751" height="190.999995" id="svg_4"/>
   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="340.463468" y="87.171138" width="158.96561" height="100.311292" id="svg_5"/>
-  <rect stroke="#000" fill="#fff" stroke-width="1.5" x="12.5" y="93.422139" width="143.223996" height="97.161201" id="svg_3"/>
+  <rect stroke="#000" fill="#fff" stroke-width="1.5" x="12.5" y="107.422139" width="143.223996" height="83.161203" id="svg_3"/>
   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="683.206419" y="115.55948" width="87.79066" height="71.980094" id="svg_1"/>
   <line stroke="#000" fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="156.66285" y1="178.252487" x2="339.64796" y2="178.252487" id="svg_12"/>
   <text stroke="#000" transform="matrix(0.5632078638875907,0,0,0.7219218336777484,199.87834592020135,38.30286693787707) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="179.181777" x="541.471584" stroke-width="0" fill="#000000" id="svg_18">/var/run/docker.sock</text>
@@ -17,7 +17,7 @@
   <text stroke="#000" transform="matrix(0.46283784062754146,0,0,0.5932671825547761,103.74444347722442,96.61092790194698) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="60.666436" x="527.85677" stroke-width="0" fill="#000000" id="svg_30">Published Port: 2376</text>
   <line stroke="#000" id="svg_7" fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="499.130005" y1="178.252487" x2="682.115115" y2="178.252487"/>
   <text stroke="#000" transform="matrix(0.9567303842193825,0,0,1.1526305024360028,17.38532537185135,4.432413045588476) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="32.911127" x="335.770666" stroke-width="0" fill="#000000" id="svg_28">Host machine</text>
-  <text stroke="#000" transform="matrix(0.8056270387421497,0,0,0.9788670786924146,7.8490345762898315,51.76431078687372) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_9" y="84.057206" x="37.377046" stroke-width="0" fill="#000000">Docker CLI</text>
+  <text stroke="#000" transform="matrix(0.8056270387421497,0,0,0.9788670786924146,7.8490345762898315,51.76431078687372) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_9" y="98.359454" x="37.377046" stroke-width="0" fill="#000000">Docker CLI</text>
   <text stroke="#000" transform="matrix(0.8056270387421497,0,0,0.9788670786924146,7.8490345762898315,51.76431078687372) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="123.690573" x="849.424218" stroke-width="0" fill="#000000" id="svg_6">daemon</text>
   <text stroke="#000" transform="matrix(0.8056270387421497,0,0,0.9788670786924146,7.8490345762898315,51.76431078687372) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="95.532013" x="856.008459" stroke-width="0" fill="#000000" id="svg_8">Docker</text>
   <text stroke="#000" transform="matrix(0.9169775747415649,0,0,0.8778060988958521,-1.1135374656077879,47.10653180662077) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="114.924002" x="551.758883" stroke-width="0" fill="#000000" id="svg_17">Socket</text>
