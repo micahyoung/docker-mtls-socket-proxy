@@ -1,35 +1,28 @@
-<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+<svg width="800" height="240" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
  <title>Docker mTLS Socket Proxy</title>
- <g>
-  <title>background</title>
-  <rect x="-1" y="-1" width="802" height="602" id="canvas_background" fill="#fff"/>
-  <g id="canvasGrid" display="none">
-   <rect id="svg_2" width="100%" height="100%" x="0" y="0" stroke-width="0" fill="url(#gridpattern)"/>
-  </g>
- </g>
  <g>
   <title>Layer 1</title>
   <g stroke="null" id="svg_11">
-   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="321.44349" y="11" width="468.05654" height="210" id="svg_4"/>
-   <text stroke="#000" transform="matrix(0.9199540311761822,0,0,1.1767693596568425,8.676822373591339,0.23204498801170992) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="34.6107" x="349.16575" stroke-width="0" fill="#000000" id="svg_28">Host machine</text>
-   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="335.05587" y="81.70352" width="161.25438" height="122.41205" id="svg_5"/>
-   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="11.5" y="108.08543" width="137.17094" height="99.19599" id="svg_3"/>
-   <text stroke="#000" transform="matrix(0.7746590409795373,0,0,0.9993669115536818,9.122706772114698,47.51330178652645) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_9" y="103.11115" x="31.1707" stroke-width="0" fill="#000000">Docker CLI</text>
-   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="683.07669" y="130.68638" width="89.05466" height="73.48753" id="svg_1"/>
-   <text stroke="#000" transform="matrix(0.7746590409795373,0,0,0.9993669115536818,9.122706772114698,47.51330178652645) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="137.74135" x="884.11403" stroke-width="0" fill="#000000" id="svg_6">daemon</text>
-   <text stroke="#000" transform="matrix(0.7746590409795373,0,0,0.9993669115536818,9.122706772114698,47.51330178652645) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="109.58279" x="889.47462" stroke-width="0" fill="#000000" id="svg_8">Docker</text>
-   <line stroke="#000" fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="148.60891" y1="194.69233" x2="334.22862" y2="194.69233" id="svg_12"/>
-   <text stroke="#000" transform="matrix(0.8817293046148577,0,0,0.8961894715760366,-9.110951193756218,46.79986251688041) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="131.66153" x="580.39602" stroke-width="0" fill="#000000" id="svg_17">Socket</text>
-   <text stroke="#000" transform="matrix(0.5713168697899611,0,0,0.7370406146148522,202.59059696797894,49.76994290025589) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="181.95216" x="523.71615" stroke-width="0" fill="#000000" id="svg_18">/var/run/docker.sock</text>
-   <text stroke="#000" transform="matrix(0.7746590409795373,0,0,0.9993669115536818,9.122706772114698,47.51330178652645) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="113.54656" x="200.05946" stroke-width="0" fill="#000000" id="svg_19">Mutual TLS</text>
-   <text stroke="#000" transform="matrix(0.5713168697899611,0,0,0.7370406146148522,-160.23889844100023,25.07965713614412) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="210.58766" x="567.70322" stroke-width="0" fill="#000000" id="svg_20">tcp://1.2.3.4:2376</text>
-   <text stroke="#000" transform="matrix(0.7746590409795373,0,0,0.9993669115536818,9.122706772114698,47.51330178652645) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="83.05682" x="430.68283" stroke-width="0" fill="#000000" id="svg_21">Proxy container</text>
-   <text stroke="#000" transform="matrix(0.5627806313853263,0,0,0.7260282417392471,9.220517884246654,108.42832614819483) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="121.59102" x="5.40673" stroke-width="0" fill="#000000" id="svg_23">Self-signed client certs</text>
-   <text stroke="#000" transform="matrix(0.5627806313853263,0,0,0.7260282417392471,9.220517884246654,108.42832614819483) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="98.13794" x="592.65752" stroke-width="0" fill="#000000" id="svg_25">Self-signed server certs</text>
-   <text stroke="#000" transform="matrix(0.4695017297919836,0,0,0.6056916254124248,94.92859007807354,95.34099982860116) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="162.88559" x="527.84903" stroke-width="0" fill="#000000" id="svg_27">SAN IP: 1.2.3.4</text>
-   <text stroke="#000" transform="matrix(0.4695017297919836,0,0,0.6056916254124248,94.92859007807354,95.34099982860116) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="-40.53937" x="509.6017" stroke-width="0" fill="#000000" id="svg_29">IP Address: 1.2.3.4</text>
-   <text stroke="#000" transform="matrix(0.4695017297919836,0,0,0.6056916254124248,94.92859007807354,95.34099982860116) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="90.38453" x="527.85677" stroke-width="0" fill="#000000" id="svg_30">Published Port: 2376</text>
-   <line stroke="#000" id="svg_7" fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="496.00687" y1="194.69233" x2="681.62658" y2="194.69233"/>
+   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="321.44349" y="14" width="468.05654" height="210" id="svg_4"/>
+   <text stroke="#000" transform="matrix(0.9199540311761825,0,0,1.1767693596568423,8.676822373591339,2.23204498801171) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="35.46048" x="349.16575" stroke-width="0" fill="#000000" id="svg_28">Host machine</text>
+   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="335.05587" y="84.70352" width="161.25438" height="122.41205" id="svg_5"/>
+   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="11.5" y="111.08543" width="137.17094" height="99.19599" id="svg_3"/>
+   <text stroke="#000" transform="matrix(0.7746590409795372,0,0,0.9993669115536817,9.122706772114698,48.51330178652644) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_9" y="105.11242" x="31.1707" stroke-width="0" fill="#000000">Docker CLI</text>
+   <rect stroke="#000" fill="#fff" stroke-width="1.5" x="683.07669" y="133.68638" width="89.05466" height="73.48753" id="svg_1"/>
+   <text stroke="#000" transform="matrix(0.7746590409795372,0,0,0.9993669115536817,9.122706772114698,48.51330178652644) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="139.74262" x="884.11403" stroke-width="0" fill="#000000" id="svg_6">daemon</text>
+   <text stroke="#000" transform="matrix(0.7746590409795372,0,0,0.9993669115536817,9.122706772114698,48.51330178652644) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="111.58406" x="889.47462" stroke-width="0" fill="#000000" id="svg_8">Docker</text>
+   <line stroke="#000" fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="148.60891" y1="197.69233" x2="334.22862" y2="197.69233" id="svg_12"/>
+   <text stroke="#000" transform="matrix(0.8817293046148577,0,0,0.8961894715760366,-9.110951193756218,46.79986251688041) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="135.00904" x="580.39602" stroke-width="0" fill="#000000" id="svg_17">Socket</text>
+   <text stroke="#000" transform="matrix(0.5713168697899612,0,0,0.7370406146148522,202.59059696797894,52.7699429002559) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="181.95216" x="523.71615" stroke-width="0" fill="#000000" id="svg_18">/var/run/docker.sock</text>
+   <text stroke="#000" transform="matrix(0.7746590409795372,0,0,0.9993669115536817,9.122706772114698,48.51330178652644) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="115.54783" x="200.05946" stroke-width="0" fill="#000000" id="svg_19">Mutual TLS</text>
+   <text stroke="#000" transform="matrix(0.5713168697899612,0,0,0.7370406146148522,-160.23889844100023,28.07965713614412) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="210.58766" x="567.70322" stroke-width="0" fill="#000000" id="svg_20">tcp://1.2.3.4:2376</text>
+   <text stroke="#000" transform="matrix(0.7746590409795372,0,0,0.9993669115536817,9.122706772114698,48.51330178652644) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="85.05809" x="430.68283" stroke-width="0" fill="#000000" id="svg_21">Proxy container</text>
+   <text stroke="#000" transform="matrix(0.5627806313853262,0,0,0.7260282417392471,9.220517884246654,109.42832614819483) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="124.34573" x="5.40673" stroke-width="0" fill="#000000" id="svg_23">Self-signed client certs</text>
+   <text stroke="#000" transform="matrix(0.5627806313853262,0,0,0.7260282417392471,9.220517884246654,109.42832614819483) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" y="100.89265" x="592.65752" stroke-width="0" fill="#000000" id="svg_25">Self-signed server certs</text>
+   <text stroke="#000" transform="matrix(0.4695017297919836,0,0,0.6056916254124249,94.92859007807354,96.34099982860117) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="166.1876" x="527.84903" stroke-width="0" fill="#000000" id="svg_27">SAN IP: 1.2.3.4</text>
+   <text stroke="#000" transform="matrix(0.4695017297919836,0,0,0.6056916254124249,94.92859007807354,96.34099982860117) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="-37.23736" x="509.6017" stroke-width="0" fill="#000000" id="svg_29">IP Address: 1.2.3.4</text>
+   <text stroke="#000" transform="matrix(0.4695017297919836,0,0,0.6056916254124249,94.92859007807354,96.34099982860117) " xml:space="preserve" text-anchor="start" font-family="Monospace" font-size="24" y="93.68654" x="527.85677" stroke-width="0" fill="#000000" id="svg_30">Published Port: 2376</text>
+   <line stroke="#000" id="svg_7" fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="496.00687" y1="197.69233" x2="681.62658" y2="197.69233"/>
   </g>
  </g>
 </svg>
