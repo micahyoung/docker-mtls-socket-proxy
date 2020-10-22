@@ -1,7 +1,7 @@
 # Container image for Mutual TLS access to Docker Daemon
 A secure, easier-to-use alternative to enabling Docker daemon's [built-in mutual TLS settings](https://docs.docker.com/engine/security/https) that works on default daemon installations.
 
-Mutual TLS connections from docker clients are securely terminated at a container then proxied to a docker daemon via a bind-mounted docker socket. 
+Mutual TLS connections from docker clients are securely terminated at a container with a process that proxies to a docker daemon via a bind-mounted docker socket. 
 
 ![Diagram](./diagram.svg)
 
