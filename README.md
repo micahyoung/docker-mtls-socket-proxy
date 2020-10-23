@@ -65,7 +65,7 @@ docker volume rm tlsproxy-certs
 
 To copy client certs from your container to your client machine, there's a helpful Bash script that is output in the logs. 
 
-When run, it will write certs to `~/.docker/$hostname/` allong with a helper `env.sh` script you can `source`. 
+When run, it will write certs to `~/.docker/$hostname/` along with a helper `env.sh` script you can `source`. 
  
 1. On Docker host, print the logs from the container
     ```
@@ -92,11 +92,17 @@ When run, it will write certs to `~/.docker/$hostname/` allong with a helper `en
     xclip -o -selection clipboard | bash
     ```
 
-  * Note: You can also copy paste data just each certs/key from the logs if preferred
-    * ~/.docker/[hostname]/cert.pem
-    * ~/.docker/[hostname]/key.pem
-    * ~/.docker/[hostname]/ca.pem
+    * Note: You can also copy paste data just each certs/key from the logs if preferred
+        * `~/.docker/$hostname/cert.pem`
+        * `~/.docker/$hostname/key.pem`
+        * `~/.docker/$hostname/ca.pem`
 
+4. On client, source your `env.sh` to set your `DOCKER_HOST` `DOCKER_TLS_VERIFY` and `DOCKER_CERT_PATH`.
+
+    ```bash
+    source ~/.docker/$hostname/env.sh
+    ```
+   
 ## Avoid your tlsproxy container
 If you stop the `tlsproxy` container, you'll lose connectivity to your daemon and have to connect over SSH to restart it (`docker start tlsproxy`).
 
