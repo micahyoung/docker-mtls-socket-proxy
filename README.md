@@ -63,34 +63,51 @@ docker volume rm tlsproxy-certs
 
 ### Copy client credentials to your client
 
-* On Docker host, print the logs from the container
-```
-docker logs tlsproxy
-```
+To copy client certs from your container to your client machine, there's a helpful Bash script that is output in the logs. 
 
-* On Docker host, copy/paste all output between `BEGIN COPY` and `END COPY`
+When run, it will write certs to `~/.docker/$hostname/` allong with a helper `env.sh` script you can `source`. 
+ 
+1. On Docker host, print the logs from the container
+    ```
+    docker logs tlsproxy
+    ```
 
-```
-##### BEGIN COPY #####
-<highlight and copy these 127 lines>
-##### END COPY #####
-```
-
-* On client, Syntax check and execute clipboard contents
+2. On Docker host, copy/paste all output between `COPY BELOW` and `COPY BELOW`
     
-```bash
-# MacOS 
-pbpaste | wc -l  # should be ~130 depending on random key lengths
-pbpaste | bash
+    ```
+    ##### COPY BELOW #####
+    <highlight and copy these lines between, usually ~100>
+    ##### COPY ABOVE #####
+    ```
 
-# Linux
-xclip -o -selection clipboard | wc -l
-xclip -o -selection clipboard | bash
-```
+3. On client, Follow `INSTRUCTIONS` from logs to check and execute clipboard contents
+
+    ```bash
+    # MacOS 
+    pbpaste | shasum  # Should match "Expected SHA1:" from logs
+    pbpaste | bash
+    
+    # Linux
+    xclip -o -selection clipboard | shasum
+    xclip -o -selection clipboard | bash
+    ```
 
   * Note: You can also copy paste data just each certs/key from the logs if preferred
     * ~/.docker/[hostname]/cert.pem
     * ~/.docker/[hostname]/key.pem
     * ~/.docker/[hostname]/ca.pem
 
-    
+## Avoid your tlsproxy container
+If you stop the `tlsproxy` container, you'll lose connectivity to your daemon and have to connect over SSH to restart it.
+
+To avoid `docker` CLI operations on your `tlsproxy` container, use filters like:
+
+* List all containers besides `tlsproxy`
+```
+docker ps -f since=tlsproxy
+```
+
+* Remove all containers besides `tlsproxy`
+```
+docker rm -f $(docker ps -q -f since=tlsproxy)
+```

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha1"
 	"crypto/tls"
 	"crypto/x509"
 	"flag"
@@ -75,8 +76,6 @@ func run(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath, caPath, c
 	}
 	defer listener.Close()
 
-	log.Printf("Listening: %v\n\n", listenAddr)
-
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
@@ -135,6 +134,10 @@ func generateCerts(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath,
 			return err
 		}
 		log.Printf("%s\n", out)
+
+		if err := removeAll(serverCSRPath, serverExtPath); err != nil {
+			return err
+		}
 	}
 
 	if _, err := os.Stat(clientCertPath); os.IsNotExist(err) {
@@ -161,10 +164,10 @@ func generateCerts(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath,
 			return err
 		}
 		log.Printf("%s\n", out)
-	}
 
-	if err := removeAll(clientCSRPath, serverCSRPath, serverExtPath, clientExtPath); err != nil {
-		return err
+		if err := removeAll(clientCSRPath, clientExtPath); err != nil {
+			return err
+		}
 	}
 
 	if err := allowAll(clientCertPath, clientKeyPath, serverCertPath, serverKeyPath, caPath, caKeyPath); err != nil {
@@ -192,7 +195,6 @@ func allowAll(paths ...string) error {
 	return nil
 }
 
-
 func clientCertCommand(hostname, clientCertPath, clientKeyPath, caPath string) (string, error) {
 	var args []interface{}
 	args = append(args, hostname)
@@ -202,12 +204,10 @@ func clientCertCommand(hostname, clientCertPath, clientKeyPath, caPath string) (
 		return "", err
 	}
 
-	data := struct{ Hostname, CertData, KeyData, CAData interface{} }{
+	scriptData := struct{ Hostname, CertData, KeyData, CAData interface{} }{
 		hostname, dataFiles[0], dataFiles[1], dataFiles[2]}
 
-	t := template.Must(template.New("tmpl").Parse(`
-##### BEGIN COPY #####
-set -o errexit
+	scriptTempl := template.Must(template.New("tmpl").Parse(`set -o errexit
 
 mkdir -p ~/.docker/{{.Hostname}}
 
@@ -228,15 +228,47 @@ export DOCKER_HOST=tcp://{{.Hostname}}:2376
 export DOCKER_CERT_PATH=~/.docker/{{.Hostname}}
 export DOCKER_TLS_VERIFY=1
 EOF
-##### END COPY #####
+
+echo "Load with: 'source ~/.docker/{{.Hostname}}/env.sh'"
 `))
 
 	envContent := &bytes.Buffer{}
-	if err := t.Execute(envContent, data); err != nil {
+	if err := scriptTempl.Execute(envContent, scriptData); err != nil {
 		return "", nil
 	}
 
-	return envContent.String(), nil
+	asciiContent := fmt.Sprintf("%+s", envContent.String())
+
+	shasum := fmt.Sprintf("%x", sha1.Sum([]byte(asciiContent)))
+
+	logData := struct{ ScriptContent, ShaSum interface{} }{
+		envContent.String(), shasum}
+
+	logTempl := template.Must(template.New("tmpl").Parse(`
+##### COPY BELOW (including newlines) #####
+{{.ScriptContent}}##### COPY ABOVE (including newlines) #####
+
+##### INSTRUCTIONS #####
+Copy to the clipboard all text and newlines between 'COPY ABOVE' and 'COPY BELOW' 
+
+Run on MacOS with:
+pbpaste | shasum  # should match {{.ShaSum}}
+pbpaste | bash
+
+or Linux:
+xclip -o -selection clipboard | shasum
+xclip -o -selection clipboard | bash
+
+Expected SHA1: {{.ShaSum}}
+##### END INSTRUCTIONS #####
+`))
+
+	logContent := &bytes.Buffer{}
+	if err := logTempl.Execute(logContent, logData); err != nil {
+		return "", nil
+	}
+
+	return logContent.String(), nil
 }
 
 func fileContents(paths ...string) ([]interface{}, error) {
