@@ -98,9 +98,9 @@ When run, it will write certs to `~/.docker/$hostname/` allong with a helper `en
     * ~/.docker/[hostname]/ca.pem
 
 ## Avoid your tlsproxy container
-If you stop the `tlsproxy` container, you'll lose connectivity to your daemon and have to connect over SSH to restart it.
+If you stop the `tlsproxy` container, you'll lose connectivity to your daemon and have to connect over SSH to restart it (`docker start tlsproxy`).
 
-To avoid `docker` CLI operations on your `tlsproxy` container, use filters like:
+To avoid `docker` CLI operations effecting your `tlsproxy` container, use filters like:
 
 * List all containers besides `tlsproxy`
 ```
