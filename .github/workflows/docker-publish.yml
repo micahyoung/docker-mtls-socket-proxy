@@ -14,8 +14,6 @@ on:
   pull_request:
     branches:
       - main
-env:
-  IMAGE_NAME: docker-mtls-socket-proxy
 jobs:
   push-linux:
     runs-on: ubuntu-latest
@@ -31,8 +29,6 @@ jobs:
 
       - name: Test
         run: |
-          mkdir -p $HOME/.docker
-
           docker run --detach \
               --name tlsproxy \
               --publish 23760:2376 \
@@ -59,7 +55,7 @@ jobs:
 
       - name: Push image
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}/${IMAGE_NAME}:${IMAGE_OS}
+          IMAGE_ID=ghcr.io/${{ github.repository }}:${IMAGE_OS}
 
           echo IMAGE_ID=${IMAGE_ID}
 
@@ -104,7 +100,7 @@ jobs:
 
       - name: Push image
         run: |
-          $IMAGE_ID="ghcr.io/${{ github.repository }}/${env:IMAGE_NAME}:${env:IMAGE_OS}"
+          $IMAGE_ID="ghcr.io/${{ github.repository }}:${env:IMAGE_OS}"
 
           echo IMAGE_ID=${IMAGE_ID}
 
