@@ -78,8 +78,6 @@ jobs:
 
       - name: Test
         run: |
-          mkdir $env:USERPROFILE\.docker
-          
           docker run --detach `
               --name tlsproxy `
               --publish 23760:2376 `
