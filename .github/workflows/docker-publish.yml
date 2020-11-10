@@ -25,7 +25,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . --file Dockerfile.linux --tag $IMAGE_NAME
+          docker build . --file Dockerfile.linux --tag docker-mtls-socket-proxy
 
       - name: Test
         run: |
@@ -59,7 +59,7 @@ jobs:
 
           echo IMAGE_ID=${IMAGE_ID}
 
-          docker tag ${IMAGE_NAME} ${IMAGE_ID}
+          docker tag docker-mtls-socket-proxy ${IMAGE_ID}
           docker push ${IMAGE_ID}
 
   push-windows:
@@ -70,7 +70,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build image
-        run: docker build . --file Dockerfile.windows --tag ${env:IMAGE_NAME} --build-arg os_tag=1809
+        run: docker build . --file Dockerfile.windows --tag docker-mtls-socket-proxy --build-arg os_tag=1809
 
       - name: Test
         run: |
@@ -104,5 +104,5 @@ jobs:
 
           echo IMAGE_ID=${IMAGE_ID}
 
-          docker tag ${env:IMAGE_NAME} ${IMAGE_ID}
+          docker tag docker-mtls-socket-proxy ${IMAGE_ID}
           docker push ${IMAGE_ID}
