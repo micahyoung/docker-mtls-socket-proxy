@@ -38,6 +38,7 @@ docker run --detach \
     --volume tlsproxy-certs:/certs \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --restart=always \
+    --memory 256m \
     docker-mtls-socket-proxy \
         -hostname $hostname
 ```
@@ -52,6 +53,7 @@ docker run --detach `
     --volume tlsproxy-certs:c:/certs `
     --volume \\.\pipe\docker_engine:\\.\pipe\docker_engine `
     --restart=always `
+    --memory 256m `
     docker-mtls-socket-proxy `
         -hostname $hostname
 ```
