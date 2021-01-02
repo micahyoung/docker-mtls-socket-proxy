@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deployment
+  labels:
+    app: test-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        app: test-app
+    spec:
+      securityContext:
+        windowsOptions:
+          runAsUserName: "ContainerAdministrator"
+      nodeSelector:
+        kubernetes.io/os: windows
+#      tolerations:
+#        - key: "windows"
+#          operator: "Equal"
+#          effect: "NoSchedule"
+#          value: "2019"
+      volumes:
+        - name: docker-socket
+          hostPath:
+            path: '\\.\pipe\docker_engine'
+        - name: tlsproxy-certs
+      containers:
+        - name: test-ctr
+          image: ghcr.io/micahyoung/docker-mtls-socket-proxy:nanoserver-1809
+          ports:
+            - containerPort: 2376
+          volumeMounts:
+            - name: docker-socket
+              mountPath: '\\.\pipe\docker_engine'
+            - name: tlsproxy-certs
+              mountPath: 'c:/certs'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-service
+  labels:
+    app: test-app
+spec:
+  ports:
+    - port: 2376
+      targetPort: 2376
+  selector:
+    app: test-app
+  type: NodePort
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: test-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: test-service
+              servicePort: 2376

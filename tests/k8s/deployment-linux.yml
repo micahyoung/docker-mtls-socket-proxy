@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deployment
+  labels:
+    app: test-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        app: test-app
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      volumes:
+        - name: docker-socket
+          hostPath:
+            path: '/var/run/docker.sock'
+        - name: tlsproxy-certs
+      containers:
+        - name: test-ctr
+          image: ghcr.io/micahyoung/docker-mtls-socket-proxy:alpine
+          ports:
+            - containerPort: 2376
+          volumeMounts:
+            - name: docker-socket
+              mountPath: '/var/run/docker.sock'
+            - name: tlsproxy-certs
+              mountPath: '/certs'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-service
+  labels:
+    app: test-app
+spec:
+  ports:
+    - port: 2376
+      targetPort: 2376
+  selector:
+    app: test-app
+  type: NodePort
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: test-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: test-service
+              servicePort: 2376
