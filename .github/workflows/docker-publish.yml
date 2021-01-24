@@ -15,34 +15,15 @@ on:
     branches:
       - main
 jobs:
-  push-linux:
+  push-linux-amd64:
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: docker-mtls-socket-proxy:alpine-amd64
     steps:
       - uses: actions/checkout@v2
 
-      - name: Enable docker binfmt_misc for ARM image support
-        run: |
-          set -o errexit -o pipefail -o nounset
-          
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-      - name: Build arm64 images
-        env:
-          IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64
-          BUILD_IMAGE_REF: golang@sha256:90c23e39762d5ac1af14fb6ffc27c1f310c43087172a83ae02f7cfc7c498384f
-          RUN_IMAGE_REF: alpine@sha256:b20140108af597a58a06ed5578f2a5737b8ad9964a206b5627d2cda906613665
-          PLATFORM: linux/arm64
-        run: |
-          set -o errexit -o pipefail -o nounset
-
-          docker pull $BUILD_IMAGE_REF
-          docker pull $RUN_IMAGE_REF
-
-          docker build . --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
-
       - name: Build amd64 images
         env:
-          IMAGE_NAME: docker-mtls-socket-proxy:alpine-amd64
           BUILD_IMAGE_REF: golang@sha256:837f776dad3314b28bdcb4bba4cdf359275a3656424eda52b88a68735c38f48c
           RUN_IMAGE_REF: alpine@sha256:d0710affa17fad5f466a70159cc458227bd25d4afb39514ef662ead3e6c99515
           PLATFORM: linux/amd64
@@ -56,7 +37,6 @@ jobs:
 
       - name: Test amd64
         env:
-          IMAGE_NAME: docker-mtls-socket-proxy:alpine-amd64
           TEST_WAIT: 20
         run: |
           docker run --detach \
@@ -84,9 +64,49 @@ jobs:
           docker rm -f tlsproxy
           rm -rf $HOME/.docker/*.pem
 
+      - name: Log into registry
+        if: github.event_name == 'push'
+        run: |
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push amd64 image
+        if: github.event_name == 'push'
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}:alpine-amd64
+
+          echo IMAGE_ID=$IMAGE_ID
+
+          docker tag $IMAGE_NAME $IMAGE_ID
+          docker push $IMAGE_ID
+
+  push-linux-arm64:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Enable docker binfmt_misc for ARM image support
+        run: |
+          set -o errexit -o pipefail -o nounset
+          
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+      - name: Build arm64 images
+        env:
+          BUILD_IMAGE_REF: golang@sha256:90c23e39762d5ac1af14fb6ffc27c1f310c43087172a83ae02f7cfc7c498384f
+          RUN_IMAGE_REF: alpine@sha256:b20140108af597a58a06ed5578f2a5737b8ad9964a206b5627d2cda906613665
+          PLATFORM: linux/arm64
+        run: |
+          set -o errexit -o pipefail -o nounset
+
+          docker pull $BUILD_IMAGE_REF
+          docker pull $RUN_IMAGE_REF
+
+          docker build . --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
+
       - name: Test arm64
         env:
-          IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64 
           TEST_WAIT: 60
         run: |
           docker run --detach \
@@ -121,8 +141,6 @@ jobs:
 
       - name: Push arm64 image
         if: github.event_name == 'push'
-        env:
-          IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}:alpine-arm64
 
@@ -131,30 +149,17 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_ID
           docker push $IMAGE_ID
 
-      - name: Push amd64 image
-        if: github.event_name == 'push'
-        env:
-          IMAGE_NAME: docker-mtls-socket-proxy:alpine-amd64
-        run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}:alpine-amd64
-
-          echo IMAGE_ID=$IMAGE_ID
-
-          docker tag $IMAGE_NAME $IMAGE_ID
-          docker push $IMAGE_ID
-
-  push-windows:
+  push-windows-amd64:
     runs-on: windows-latest
     env:
-      IMAGE_OS: nanoserver-1809
+      IMAGE_NAME: docker-mtls-socket-proxy:nanoserver-amd64
     steps:
       - uses: actions/checkout@v2
       - name: Build image
-        run: docker build . --file Dockerfile.windows --tag docker-mtls-socket-proxy:nanoserver-amd64 --build-arg os_tag=1809
+        run: docker build . --file Dockerfile.windows --tag $env:IMAGE_NAME --build-arg os_tag=1809
 
       - name: Test
         env:
-          IMAGE_NAME: docker-mtls-socket-proxy:nanoserver-amd64
           TEST_WAIT: 45  
         run: |
           docker run --detach `
@@ -195,5 +200,5 @@ jobs:
 
           echo IMAGE_ID=${IMAGE_ID}
 
-          docker tag docker-mtls-socket-proxy:nanoserver-amd64 "ghcr.io/${{ github.repository }}:${env:IMAGE_OS}-amd64"
+          docker tag docker-mtls-socket-proxy:nanoserver-amd64 $IMAGE_ID
           docker push ${IMAGE_ID}
