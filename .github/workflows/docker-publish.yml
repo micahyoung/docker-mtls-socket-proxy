@@ -5,29 +5,44 @@ on:
     # Publish `main` as Docker `latest` image.
     branches:
       - main
-
+   
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
+
+    paths-ignore:
+      - README.md
 
   # Run tests for any PRs.
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - README.md
+
 jobs:
-  push-linux:
+  push-linux-amd64:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
     env:
-      IMAGE_OS: alpine
+      IMAGE_NAME: docker-mtls-socket-proxy:alpine-amd64
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build image
+      - name: Build amd64 images
+        env:
+          BUILD_IMAGE_REF: golang:1.14-alpine
+          RUN_IMAGE_REF: alpine:latest
         run: |
-          docker build . --file Dockerfile.linux --tag docker-mtls-socket-proxy
+          set -o errexit -o pipefail -o nounset
 
-      - name: Test
+          docker pull $BUILD_IMAGE_REF
+          docker pull $RUN_IMAGE_REF
+
+          docker build . --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
+
+      - name: Test amd64
+        env:
+          TEST_WAIT: 20
         run: |
           docker run --detach \
               --name tlsproxy \
@@ -35,12 +50,12 @@ jobs:
               --volume $HOME/.docker:/certs \
               --volume /var/run/docker.sock:/var/run/docker.sock \
               --restart always \
-              docker-mtls-socket-proxy
-
+              $IMAGE_NAME
+              
           docker logs -f tlsproxy &
           
           # wait for certs to be generated
-          sleep 10
+          sleep $TEST_WAIT
           
           # Test connection
           export DOCKER_HOST="tcp://localhost:23760"
@@ -49,30 +64,116 @@ jobs:
 
           docker info
 
+          # cleanup
+          unset DOCKER_HOST DOCKER_TLS_VERIFY DOCKER_CERT_PATH
+          docker rm -f tlsproxy
+          rm -rf $HOME/.docker/*.pem
+
       - name: Log into registry
+        if: github.event_name == 'push'
         run: |
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push image
+      - name: Push amd64 image
+        if: github.event_name == 'push'
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}:${IMAGE_OS}
+          IMAGE_ID=ghcr.io/${{ github.repository }}:alpine-amd64
 
-          echo IMAGE_ID=${IMAGE_ID}
+          echo IMAGE_ID=$IMAGE_ID
 
-          docker tag docker-mtls-socket-proxy ${IMAGE_ID}
-          docker push ${IMAGE_ID}
+          docker tag $IMAGE_NAME $IMAGE_ID
+          docker push $IMAGE_ID
 
-  push-windows:
-    runs-on: windows-latest
-    if: github.event_name == 'push'
+  push-linux-arm64:
+    runs-on: ubuntu-latest
     env:
-      IMAGE_OS: nanoserver-1809
+      IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64
     steps:
       - uses: actions/checkout@v2
-      - name: Build image
-        run: docker build . --file Dockerfile.windows --tag docker-mtls-socket-proxy --build-arg os_tag=1809
+
+      - name: Enable docker binfmt_misc for ARM image support
+        run: |
+          set -o errexit -o pipefail -o nounset
+          
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+      - name: Build arm64 images
+        env:
+          # crane manifest golang:1.14-alpine | jq '.manifests[] | select(.platform.architecture=="arm64") | .digest'
+          BUILD_IMAGE_REF: golang@sha256:90c23e39762d5ac1af14fb6ffc27c1f310c43087172a83ae02f7cfc7c498384f
+          # crane manifest alpine | jq '.manifests[] | select(.platform.architecture=="arm64") | .digest'
+          RUN_IMAGE_REF: alpine@sha256:b20140108af597a58a06ed5578f2a5737b8ad9964a206b5627d2cda906613665
+        run: |
+          set -o errexit -o pipefail -o nounset
+
+          docker pull $BUILD_IMAGE_REF
+          docker pull $RUN_IMAGE_REF
+
+          docker build . --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
+
+      - name: Test arm64
+        env:
+          TEST_WAIT: 60
+        run: |
+          docker run --detach \
+              --name tlsproxy \
+              --publish 23760:2376 \
+              --volume $HOME/.docker:/certs \
+              --volume /var/run/docker.sock:/var/run/docker.sock \
+              --restart always \
+              $IMAGE_NAME
+              
+          docker logs -f tlsproxy &
+          
+          # wait for certs to be generated
+          sleep $TEST_WAIT
+          
+          # Test connection
+          export DOCKER_HOST="tcp://localhost:23760"
+          export DOCKER_TLS_VERIFY="1"
+          export DOCKER_CERT_PATH="$HOME/.docker"
+
+          docker info
+
+          # cleanup
+          unset DOCKER_HOST DOCKER_TLS_VERIFY DOCKER_CERT_PATH
+          docker rm -f tlsproxy
+          rm -rf $HOME/.docker/*.pem
+          
+      - name: Log into registry
+        if: github.event_name == 'push'
+        run: |
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push arm64 image
+        if: github.event_name == 'push'
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}:alpine-arm64
+
+          echo IMAGE_ID=$IMAGE_ID
+
+          docker tag $IMAGE_NAME $IMAGE_ID
+          docker push $IMAGE_ID
+
+  push-windows-amd64:
+    runs-on: windows-latest
+    env:
+      IMAGE_NAME: docker-mtls-socket-proxy:nanoserver-amd64
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build amd64 images
+        env:
+          BUILD_IMAGE_REF: golang:1.14-nanoserver-1809
+          RUN_IMAGE_REF: mcr.microsoft.com/windows/nanoserver:1809-amd64
+        run: |
+          docker pull $env:BUILD_IMAGE_REF
+          docker pull $env:RUN_IMAGE_REF
+
+          docker build . --build-arg BUILD_IMAGE=$env:BUILD_IMAGE_REF --build-arg RUN_IMAGE=$env:RUN_IMAGE_REF --file Dockerfile.windows --tag $env:IMAGE_NAME
 
       - name: Test
+        env:
+          TEST_WAIT: 45  
         run: |
           docker run --detach `
               --name tlsproxy `
@@ -80,12 +181,12 @@ jobs:
               --volume $env:USERPROFILE\.docker:c:/certs `
               --volume \\.\pipe\docker_engine:\\.\pipe\docker_engine `
               --restart always `
-              docker-mtls-socket-proxy
+              $env:IMAGE_NAME
 
           Start-Process -NoNewWindow -FilePath docker -ArgumentList "logs -f tlsproxy"
  
           # wait for certs to be generated
-          Start-Sleep 30
+          Start-Sleep $env:TEST_WAIT
 
           # Test connection
           $env:DOCKER_HOST="tcp://localhost:23760"
@@ -93,16 +194,24 @@ jobs:
           $env:DOCKER_CERT_PATH="$env:USERPROFILE\.docker"
           
           docker info
-
+          
+          # cleanup          
+          $env:DOCKER_HOST=""
+          $env:DOCKER_TLS_VERIFY=""
+          $env:DOCKER_CERT_PATH=""
+          docker rm -f tlsproxy
+          
       - name: Log into registry
+        if: github.event_name == 'push'
         run: |
           echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Push image
+        if: github.event_name == 'push'
         run: |
-          $IMAGE_ID="ghcr.io/${{ github.repository }}:${env:IMAGE_OS}"
+          $IMAGE_ID="ghcr.io/${{ github.repository }}:nanoserver-amd64"
 
           echo IMAGE_ID=${IMAGE_ID}
 
-          docker tag docker-mtls-socket-proxy ${IMAGE_ID}
+          docker tag docker-mtls-socket-proxy:nanoserver-amd64 $IMAGE_ID
           docker push ${IMAGE_ID}

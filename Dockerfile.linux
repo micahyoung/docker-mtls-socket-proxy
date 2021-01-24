@@ -1,4 +1,7 @@
-FROM golang:1.14-alpine AS builder
+ARG BUILD_IMAGE=golang:1.14-alpine
+ARG RUN_IMAGE=alpine
+
+FROM $BUILD_IMAGE AS builder
 
 WORKDIR /src
 
@@ -6,7 +9,7 @@ COPY . .
 
 RUN go build -o dockerproxy
 
-FROM alpine
+FROM $RUN_IMAGE
 
 USER root
 
