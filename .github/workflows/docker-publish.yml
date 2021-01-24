@@ -42,7 +42,7 @@ jobs:
 
       - name: Build amd64 images
         env:
-          IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64
+          IMAGE_NAME: docker-mtls-socket-proxy:alpine-amd64
           BUILD_IMAGE_REF: golang@sha256:837f776dad3314b28bdcb4bba4cdf359275a3656424eda52b88a68735c38f48c
           RUN_IMAGE_REF: alpine@sha256:d0710affa17fad5f466a70159cc458227bd25d4afb39514ef662ead3e6c99515
           PLATFORM: linux/amd64
