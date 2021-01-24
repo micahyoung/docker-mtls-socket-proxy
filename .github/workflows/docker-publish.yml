@@ -36,7 +36,7 @@ jobs:
           set -o errexit -o pipefail -o nounset
 
           docker pull $BUILD_IMAGE_REF
-          docker pull $RUN_IMAGE_NAME
+          docker pull $RUN_IMAGE_REF
 
           docker build . --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
 
@@ -50,7 +50,7 @@ jobs:
           set -o errexit -o pipefail -o nounset
 
           docker pull $BUILD_IMAGE_REF
-          docker pull $RUN_IMAGE_NAME
+          docker pull $RUN_IMAGE_REF
 
           docker build . --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
 
