@@ -22,7 +22,7 @@ docker build --tag docker-mtls-socket-proxy -f Dockerfile.linux .
   
 #### Windows
 ```powershell
-docker build --tag docker-mtls-socket-proxy -f Dockerfile.windows --build-arg os_tag=1809 .
+docker build --tag docker-mtls-socket-proxy -f Dockerfile.windows .
 ```
 
 ### Start your container
