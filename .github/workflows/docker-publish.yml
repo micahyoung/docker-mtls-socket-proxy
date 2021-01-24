@@ -32,7 +32,7 @@ jobs:
         run: |
           set -o errexit -o pipefail -o nounset
           
-          docker build . --platform linux/arm64 --build-arg IMAGE_PLATFORM=linux/arm64 --file Dockerfile.linux --tag $IMAGE_NAME
+          docker build . --platform linux/arm64 --build-arg IMAGE_PLATFORM=linux/arm64 --file Dockerfile.linux --tag $IMAGE_NAME --no-cache
 
       - name: Build amd64 images
         env:
@@ -40,7 +40,7 @@ jobs:
         run: |
           set -o errexit -o pipefail -o nounset
           
-          docker build . --platform linux/amd64 --build-arg IMAGE_PLATFORM=linux/amd64 --file Dockerfile.linux --tag $IMAGE_NAME
+          docker build . --platform linux/amd64 --build-arg IMAGE_PLATFORM=linux/amd64 --file Dockerfile.linux --tag $IMAGE_NAME --no-cache
 
       - name: Test amd64
         env:
