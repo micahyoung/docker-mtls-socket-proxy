@@ -66,8 +66,8 @@ jobs:
 
           docker info
 
-          docker rm -f tlsproxy
-          
+          docker -H unix:///var/run/docker.sock rm -f tlsproxy
+       
           rm -rf $HOME/.docker/*.pem
           
       - name: Test amd64
@@ -94,7 +94,7 @@ jobs:
 
           docker info
 
-          docker rm -f tlsproxy
+          docker -H unix:///var/run/docker.sock rm -f tlsproxy
 
           rm -rf $HOME/.docker/*.pem
 
