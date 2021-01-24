@@ -42,34 +42,6 @@ jobs:
           
           docker build . --platform linux/amd64 --build-arg IMAGE_PLATFORM=linux/amd64 --file Dockerfile.linux --tag $IMAGE_NAME
 
-      - name: Test arm64
-        env:
-          IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64 
-        run: |
-          docker run --detach \
-              --name tlsproxy \
-              --publish 23760:2376 \
-              --volume $HOME/.docker:/certs \
-              --volume /var/run/docker.sock:/var/run/docker.sock \
-              --restart always \
-              $IMAGE_NAME
-              
-          docker logs -f tlsproxy &
-          
-          # wait for certs to be generated
-          sleep 10
-          
-          # Test connection
-          export DOCKER_HOST="tcp://localhost:23760"
-          export DOCKER_TLS_VERIFY="1"
-          export DOCKER_CERT_PATH="$HOME/.docker"
-
-          docker info
-
-          docker -H unix:///var/run/docker.sock rm -f tlsproxy
-       
-          rm -rf $HOME/.docker/*.pem
-          
       - name: Test amd64
         env:
           IMAGE_NAME: docker-mtls-socket-proxy:alpine-amd64
@@ -98,6 +70,34 @@ jobs:
 
           rm -rf $HOME/.docker/*.pem
 
+      - name: Test arm64
+        env:
+          IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64 
+        run: |
+          docker run --detach \
+              --name tlsproxy \
+              --publish 23760:2376 \
+              --volume $HOME/.docker:/certs \
+              --volume /var/run/docker.sock:/var/run/docker.sock \
+              --restart always \
+              $IMAGE_NAME
+              
+          docker logs -f tlsproxy &
+          
+          # wait for certs to be generated
+          sleep 10
+          
+          # Test connection
+          export DOCKER_HOST="tcp://localhost:23760"
+          export DOCKER_TLS_VERIFY="1"
+          export DOCKER_CERT_PATH="$HOME/.docker"
+
+          docker info
+
+          docker -H unix:///var/run/docker.sock rm -f tlsproxy
+       
+          rm -rf $HOME/.docker/*.pem
+          
       - name: Log into registry
         if: github.event_name == 'push'
         run: |
@@ -157,8 +157,8 @@ jobs:
           $env:DOCKER_CERT_PATH="$env:USERPROFILE\.docker"
           
           docker info
-
-          docker rm -f tlsproxy
+          
+          docker -H npipe:////./pipe/docker_engine rm -f tlsproxy
           
       - name: Log into registry
         if: github.event_name == 'push'
