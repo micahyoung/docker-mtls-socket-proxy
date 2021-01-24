@@ -29,18 +29,30 @@ jobs:
       - name: Build arm64 images
         env:
           IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64
+          BUILD_IMAGE_NAME: golang
+          RUN_IMAGE_NAME: alpine
+          PLATFORM: linux/arm64
         run: |
           set -o errexit -o pipefail -o nounset
-          
-          docker build . --platform linux/arm64 --build-arg IMAGE_PLATFORM=linux/arm64 --file Dockerfile.linux --tag $IMAGE_NAME --no-cache
+
+          docker pull --platform $PLATFORM $BUILD_IMAGE_NAME
+          docker pull --platform $PLATFORM $RUN_IMAGE_NAME
+
+          docker build . --platform $PLATFORM --build-arg BUILD_IMAGE=$BUILD_IMAGE_NAME --build-arg RUN_IMAGE=$RUN_IMAGE_NAME --file Dockerfile.linux --tag $IMAGE_NAME
 
       - name: Build amd64 images
         env:
           IMAGE_NAME: docker-mtls-socket-proxy:alpine-amd64
+          BUILD_IMAGE_NAME: golang
+          RUN_IMAGE_NAME: alpine
+          PLATFORM: linux/arm64
         run: |
           set -o errexit -o pipefail -o nounset
-          
-          docker build . --platform linux/amd64 --build-arg IMAGE_PLATFORM=linux/amd64 --file Dockerfile.linux --tag $IMAGE_NAME --no-cache
+
+          docker pull --platform $PLATFORM $BUILD_IMAGE_NAME
+          docker pull --platform $PLATFORM $RUN_IMAGE_NAME
+
+          docker build . --platform $PLATFORM --build-arg BUILD_IMAGE=$BUILD_IMAGE_NAME --build-arg RUN_IMAGE=$RUN_IMAGE_NAME --file Dockerfile.linux --tag $IMAGE_NAME
 
       - name: Test amd64
         env:
@@ -57,7 +69,7 @@ jobs:
           docker logs -f tlsproxy &
           
           # wait for certs to be generated
-          sleep 10
+          sleep 20
           
           # Test connection
           export DOCKER_HOST="tcp://localhost:23760"
@@ -85,7 +97,7 @@ jobs:
           docker logs -f tlsproxy &
           
           # wait for certs to be generated
-          sleep 10
+          sleep 20
           
           # Test connection
           export DOCKER_HOST="tcp://localhost:23760"
@@ -149,7 +161,7 @@ jobs:
           Start-Process -NoNewWindow -FilePath docker -ArgumentList "logs -f tlsproxy"
  
           # wait for certs to be generated
-          Start-Sleep 30
+          Start-Sleep 45
 
           # Test connection
           $env:DOCKER_HOST="tcp://localhost:23760"
