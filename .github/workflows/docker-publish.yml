@@ -30,7 +30,7 @@ jobs:
         env:
           IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64
           BUILD_IMAGE_REF: golang@sha256:90c23e39762d5ac1af14fb6ffc27c1f310c43087172a83ae02f7cfc7c498384f
-          RUN_IMAGE_REF: sha256:b20140108af597a58a06ed5578f2a5737b8ad9964a206b5627d2cda906613665
+          RUN_IMAGE_REF: alpine@sha256:b20140108af597a58a06ed5578f2a5737b8ad9964a206b5627d2cda906613665
           PLATFORM: linux/arm64
         run: |
           set -o errexit -o pipefail -o nounset
