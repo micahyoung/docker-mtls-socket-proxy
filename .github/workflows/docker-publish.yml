@@ -57,6 +57,7 @@ jobs:
       - name: Test amd64
         env:
           IMAGE_NAME: docker-mtls-socket-proxy:alpine-amd64
+          TEST_WAIT: 20
         run: |
           docker run --detach \
               --name tlsproxy \
@@ -69,7 +70,7 @@ jobs:
           docker logs -f tlsproxy &
           
           # wait for certs to be generated
-          sleep 20
+          sleep $TEST_WAIT
           
           # Test connection
           export DOCKER_HOST="tcp://localhost:23760"
@@ -86,6 +87,7 @@ jobs:
       - name: Test arm64
         env:
           IMAGE_NAME: docker-mtls-socket-proxy:alpine-arm64 
+          TEST_WAIT: 60
         run: |
           docker run --detach \
               --name tlsproxy \
@@ -98,7 +100,7 @@ jobs:
           docker logs -f tlsproxy &
           
           # wait for certs to be generated
-          sleep 20
+          sleep $TEST_WAIT
           
           # Test connection
           export DOCKER_HOST="tcp://localhost:23760"
@@ -151,6 +153,9 @@ jobs:
         run: docker build . --file Dockerfile.windows --tag docker-mtls-socket-proxy:nanoserver-amd64 --build-arg os_tag=1809
 
       - name: Test
+        env:
+          IMAGE_NAME: docker-mtls-socket-proxy:nanoserver-amd64
+          TEST_WAIT: 45  
         run: |
           docker run --detach `
               --name tlsproxy `
@@ -158,12 +163,12 @@ jobs:
               --volume $env:USERPROFILE\.docker:c:/certs `
               --volume \\.\pipe\docker_engine:\\.\pipe\docker_engine `
               --restart always `
-              docker-mtls-socket-proxy:nanoserver-amd64
+              $env:IMAGE_NAME
 
           Start-Process -NoNewWindow -FilePath docker -ArgumentList "logs -f tlsproxy"
  
           # wait for certs to be generated
-          Start-Sleep 45
+          Start-Sleep $env:TEST_WAIT
 
           # Test connection
           $env:DOCKER_HOST="tcp://localhost:23760"
