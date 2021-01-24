@@ -78,8 +78,9 @@ jobs:
 
           docker info
 
-          docker -H unix:///var/run/docker.sock rm -f tlsproxy
-
+          # cleanup
+          unset DOCKER_HOST DOCKER_TLS_VERIFY DOCKER_CERT_PATH
+          docker rm -f tlsproxy
           rm -rf $HOME/.docker/*.pem
 
       - name: Test arm64
@@ -106,8 +107,9 @@ jobs:
 
           docker info
 
-          docker -H unix:///var/run/docker.sock rm -f tlsproxy
-       
+          # cleanup
+          unset DOCKER_HOST DOCKER_TLS_VERIFY DOCKER_CERT_PATH
+          docker rm -f tlsproxy
           rm -rf $HOME/.docker/*.pem
           
       - name: Log into registry
@@ -170,7 +172,11 @@ jobs:
           
           docker info
           
-          docker -H npipe:////./pipe/docker_engine rm -f tlsproxy
+          # cleanup          
+          $env:DOCKER_HOST=""
+          $env:DOCKER_TLS_VERIFY=""
+          $env:DOCKER_CERT_PATH=""
+          docker rm -f tlsproxy
           
       - name: Log into registry
         if: github.event_name == 'push'
