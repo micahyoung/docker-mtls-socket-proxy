@@ -155,8 +155,15 @@ jobs:
       IMAGE_NAME: docker-mtls-socket-proxy:nanoserver-amd64
     steps:
       - uses: actions/checkout@v2
-      - name: Build image
-        run: docker build . --file Dockerfile.windows --tag $env:IMAGE_NAME --build-arg os_tag=1809
+      - name: Build amd64 images
+        env:
+          BUILD_IMAGE_REF: golang:1.14-nanoserver-1809
+          RUN_IMAGE_REF: mcr.microsoft.com/windows/nanoserver:1809-amd64
+        run: |
+          docker pull $env:BUILD_IMAGE_REF
+          docker pull $env:RUN_IMAGE_REF
+
+          docker build . --build-arg BUILD_IMAGE=$env:BUILD_IMAGE_REF --build-arg RUN_IMAGE=$env:RUN_IMAGE_REF --file Dockerfile.windows --tag $env:IMAGE_NAME
 
       - name: Test
         env:
