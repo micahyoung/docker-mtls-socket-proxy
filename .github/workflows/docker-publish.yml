@@ -24,9 +24,8 @@ jobs:
 
       - name: Build amd64 images
         env:
-          BUILD_IMAGE_REF: golang@sha256:837f776dad3314b28bdcb4bba4cdf359275a3656424eda52b88a68735c38f48c
-          RUN_IMAGE_REF: alpine@sha256:d0710affa17fad5f466a70159cc458227bd25d4afb39514ef662ead3e6c99515
-          PLATFORM: linux/amd64
+          BUILD_IMAGE_REF: golang:1.14-alpine
+          RUN_IMAGE_REF: alpine:latest
         run: |
           set -o errexit -o pipefail -o nounset
 
@@ -94,9 +93,10 @@ jobs:
 
       - name: Build arm64 images
         env:
+          # crane manifest golang:1.14-alpine | jq '.manifests[] | select(.platform.architecture=="arm64") | .digest'
           BUILD_IMAGE_REF: golang@sha256:90c23e39762d5ac1af14fb6ffc27c1f310c43087172a83ae02f7cfc7c498384f
+          # crane manifest alpine | jq '.manifests[] | select(.platform.architecture=="arm64") | .digest'
           RUN_IMAGE_REF: alpine@sha256:b20140108af597a58a06ed5578f2a5737b8ad9964a206b5627d2cda906613665
-          PLATFORM: linux/arm64
         run: |
           set -o errexit -o pipefail -o nounset
 
