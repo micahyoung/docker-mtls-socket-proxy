@@ -1,4 +1,5 @@
-FROM golang:1.14-alpine AS builder
+ARG IMAGE_PLATFORM=linux/amd64
+FROM --platform=$IMAGE_PLATFORM golang:1.14-alpine AS builder
 
 WORKDIR /src
 
