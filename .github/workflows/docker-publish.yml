@@ -25,6 +25,7 @@ jobs:
 
       - name: Build linux images
         run: |
+          apt-get update && apt-get install -y qemu-user-static
           docker build . --platform linux/amd64 --build-arg IMAGE_PLATFORM=linux/arm64 --file Dockerfile.linux --tag docker-mtls-socket-proxy:alpine-arm64
           docker build . --platform linux/amd64 --build-arg IMAGE_PLATFORM=linux/amd64 --file Dockerfile.linux --tag docker-mtls-socket-proxy:alpine-amd64
 
