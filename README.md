@@ -12,23 +12,10 @@ Mutual TLS connections from docker clients are securely terminated at a containe
 
 ## Usage
 
-### Build the image locally on a Docker daemon
-#### Linux/MacOS
-Note: no certs are included in the image. It generates self-signed certs on container start.
-
-```bash
-docker build --tag docker-mtls-socket-proxy -f Dockerfile.linux .
-```
-  
-#### Windows
-```powershell
-docker build --tag docker-mtls-socket-proxy -f Dockerfile.windows .
-```
-
 ### Start your container
 This will start the process and generate self-signed certificates (or re-use previously generated ones). 
 
-#### Linux/MacOS
+#### Linux/MacOS AMD64
 ```bash
 hostname=<"my-docker-host" or "10.1.2.3">
 
@@ -39,9 +26,10 @@ docker run --detach \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --restart=always \
     --memory 256m \
-    docker-mtls-socket-proxy \
+    ghcr.io/micahyoung/docker-mtls-socket-proxy:alpine-amd64 \
         -hostname $hostname
 ```
+* ARM64 image at: `ghcr.io/micahyoung/docker-mtls-socket-proxy:alpine-arm64`
 
 # Windows
 ```powershell
@@ -54,7 +42,7 @@ docker run --detach `
     --volume \\.\pipe\docker_engine:\\.\pipe\docker_engine `
     --restart=always `
     --memory 256m `
-    docker-mtls-socket-proxy `
+    ghcr.io/micahyoung/docker-mtls-socket-proxy:nanoserver-amd64 `
         -hostname $hostname
 ```
 
@@ -119,3 +107,18 @@ docker ps -f since=tlsproxy
 ```
 docker rm -f $(docker ps -q -f since=tlsproxy)
 ```
+
+## Build the image locally on a Docker daemon
+#### Linux/MacOS
+Note: no certs are included in the image. It generates self-signed certs on container start.
+
+```bash
+docker build --tag docker-mtls-socket-proxy -f Dockerfile.linux .
+```
+  
+#### Windows
+```powershell
+docker build --tag docker-mtls-socket-proxy -f Dockerfile.windows .
+```
+
+
