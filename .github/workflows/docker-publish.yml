@@ -12,7 +12,7 @@ on:
 
     paths-ignore:
       - README.md
-
+  
   # Run tests for any PRs.
   pull_request:
     branches:
@@ -20,6 +20,7 @@ on:
     paths-ignore:
       - README.md
 
+  workflow_dispatch:
 jobs:
   push-linux-amd64:
     runs-on: ubuntu-latest
