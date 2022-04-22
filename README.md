@@ -40,8 +40,9 @@ docker run --detach `
     --publish 2376:2376 `
     --volume tlsproxy-certs:c:/certs `
     --volume \\.\pipe\docker_engine:\\.\pipe\docker_engine `
-    --restart=always `
+    --restart always `
     --memory 256m `
+    --isolation process `
     ghcr.io/micahyoung/docker-mtls-socket-proxy:nanoserver-amd64 `
         -hostname $hostname
 ```
