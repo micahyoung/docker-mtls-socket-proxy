@@ -164,8 +164,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build windows amd64 images
         env:
-          BUILD_IMAGE_REF: golang:1.14-nanoserver-ltsc2022
-          RUN_IMAGE_REF: mcr.microsoft.com/windows/nanoserver:2022-amd64
+          BUILD_IMAGE_REF: golang:1.17-nanoserver-ltsc2022
+          RUN_IMAGE_REF: mcr.microsoft.com/windows/nanoserver:ltsc2022-amd64
         run: |
           docker pull $env:BUILD_IMAGE_REF
           docker pull $env:RUN_IMAGE_REF
