@@ -33,13 +33,14 @@ jobs:
         env:
           BUILD_IMAGE_REF: golang:1.17-alpine
           RUN_IMAGE_REF: alpine:latest
+          PLATFORM: linux/amd64
         run: |
           set -o errexit -o pipefail -o nounset
 
-          docker pull $BUILD_IMAGE_REF
-          docker pull $RUN_IMAGE_REF
+          docker pull --platform=$PLATFORM $BUILD_IMAGE_REF
+          docker pull --platform=$PLATFORM $RUN_IMAGE_REF
 
-          docker build . --platform=linux/amd64 --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
+          docker build . --platform=$PLATFORM --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
 
       - name: Test linux amd64
         env:
@@ -102,13 +103,14 @@ jobs:
         env:
           BUILD_IMAGE_REF: golang:1.17-alpine
           RUN_IMAGE_REF: alpine:latest
+          PLATFORM: linux/arm64
         run: |
           set -o errexit -o pipefail -o nounset
 
-          docker pull $BUILD_IMAGE_REF
-          docker pull $RUN_IMAGE_REF
+          docker pull --platform=$PLATFORM $BUILD_IMAGE_REF
+          docker pull --platform=$PLATFORM $RUN_IMAGE_REF
 
-          docker build . --platform=linux/arm64 --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
+          docker build . --platform=$PLATFORM --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
 
       - name: Test linux arm64
         env:
@@ -164,11 +166,12 @@ jobs:
         env:
           BUILD_IMAGE_REF: golang:1.17-nanoserver-ltsc2022
           RUN_IMAGE_REF: mcr.microsoft.com/windows/nanoserver:ltsc2022-amd64
+          PLATFORM: windows/amd64
         run: |
-          docker pull $env:BUILD_IMAGE_REF
-          docker pull $env:RUN_IMAGE_REF
+          docker pull --platform $env:PLATFORM $env:BUILD_IMAGE_REF
+          docker pull --platform $env:PLATFORM $env:RUN_IMAGE_REF
 
-          docker build . --build-arg BUILD_IMAGE=$env:BUILD_IMAGE_REF --build-arg RUN_IMAGE=$env:RUN_IMAGE_REF --file Dockerfile.windows --tag $env:IMAGE_NAME
+          docker build . --platform $env:PLATFORM --build-arg BUILD_IMAGE=$env:BUILD_IMAGE_REF --build-arg RUN_IMAGE=$env:RUN_IMAGE_REF --file Dockerfile.windows --tag $env:IMAGE_NAME
 
       - name: Test
         env:
