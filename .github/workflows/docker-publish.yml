@@ -39,7 +39,7 @@ jobs:
           docker pull $BUILD_IMAGE_REF
           docker pull $RUN_IMAGE_REF
 
-          docker build . --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
+          docker build . --platform=linux/amd64 --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
 
       - name: Test linux amd64
         env:
@@ -100,17 +100,15 @@ jobs:
 
       - name: Build linux arm64 images
         env:
-          # crane manifest golang:1.17-alpine | jq '.manifests[] | select(.platform.architecture=="arm64") | .digest'
-          BUILD_IMAGE_REF: golang@sha256:4d472ab204ad9364b037f81aa6bcef242a2dc4548e5e657da5ffbd1b41a27dcb
-          # crane manifest alpine | jq '.manifests[] | select(.platform.architecture=="arm64") | .digest'
-          RUN_IMAGE_REF: alpine@sha256:b06a5cf61b2956088722c4f1b9a6f71dfe95f0b1fe285d44195452b8a1627de7
+          BUILD_IMAGE_REF: golang:1.17-alpine
+          RUN_IMAGE_REF: alpine:latest
         run: |
           set -o errexit -o pipefail -o nounset
 
           docker pull $BUILD_IMAGE_REF
           docker pull $RUN_IMAGE_REF
 
-          docker build . --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
+          docker build . --platform=linux/arm64 --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
 
       - name: Test linux arm64
         env:
