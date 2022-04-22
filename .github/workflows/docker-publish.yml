@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build amd64 images
+      - name: Build linux amd64 images
         env:
           BUILD_IMAGE_REF: golang:1.17-alpine
           RUN_IMAGE_REF: alpine:latest
@@ -41,7 +41,7 @@ jobs:
 
           docker build . --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
 
-      - name: Test amd64
+      - name: Test linux amd64
         env:
           TEST_WAIT: 20
         run: |
@@ -75,7 +75,7 @@ jobs:
         run: |
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push amd64 image
+      - name: Push linux amd64 image
         if: github.event_name == 'push'
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}:alpine-amd64
@@ -98,7 +98,7 @@ jobs:
           
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-      - name: Build arm64 images
+      - name: Build linux arm64 images
         env:
           # crane manifest golang:1.17-alpine | jq '.manifests[] | select(.platform.architecture=="arm64") | .digest'
           BUILD_IMAGE_REF: golang@sha256:4d472ab204ad9364b037f81aa6bcef242a2dc4548e5e657da5ffbd1b41a27dcb
@@ -112,7 +112,7 @@ jobs:
 
           docker build . --build-arg BUILD_IMAGE=$BUILD_IMAGE_REF --build-arg RUN_IMAGE=$RUN_IMAGE_REF --file Dockerfile.linux --tag $IMAGE_NAME
 
-      - name: Test arm64
+      - name: Test linux arm64
         env:
           TEST_WAIT: 60
         run: |
@@ -146,7 +146,7 @@ jobs:
         run: |
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push arm64 image
+      - name: Push linux arm64 image
         if: github.event_name == 'push'
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}:alpine-arm64
@@ -162,10 +162,10 @@ jobs:
       IMAGE_NAME: docker-mtls-socket-proxy:nanoserver-amd64
     steps:
       - uses: actions/checkout@v2
-      - name: Build amd64 images
+      - name: Build windows amd64 images
         env:
-          BUILD_IMAGE_REF: golang:1.14-nanoserver-1809
-          RUN_IMAGE_REF: mcr.microsoft.com/windows/nanoserver:1809-amd64
+          BUILD_IMAGE_REF: golang:1.17-nanoserver-ltsc2022
+          RUN_IMAGE_REF: mcr.microsoft.com/windows/nanoserver:ltsc2022-amd64
         run: |
           docker pull $env:BUILD_IMAGE_REF
           docker pull $env:RUN_IMAGE_REF
@@ -207,7 +207,7 @@ jobs:
         run: |
           echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push image
+      - name: Push windows amd64 image
         if: github.event_name == 'push'
         run: |
           $IMAGE_ID="ghcr.io/${{ github.repository }}:nanoserver-amd64"
