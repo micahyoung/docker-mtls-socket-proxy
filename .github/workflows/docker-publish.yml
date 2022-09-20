@@ -31,7 +31,7 @@ jobs:
 
       - name: Build linux amd64 images
         env:
-          BUILD_IMAGE_REF: golang:1.17-alpine
+          BUILD_IMAGE_REF: golang:1.19-alpine
           RUN_IMAGE_REF: alpine:latest
           PLATFORM: linux/amd64
         run: |
@@ -101,7 +101,7 @@ jobs:
 
       - name: Build linux arm64 images
         env:
-          BUILD_IMAGE_REF: golang:1.17-alpine
+          BUILD_IMAGE_REF: golang:1.19-alpine
           RUN_IMAGE_REF: alpine:latest
           PLATFORM: linux/arm64
         run: |
@@ -164,7 +164,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build windows amd64 images
         env:
-          BUILD_IMAGE_REF: golang:1.17-nanoserver-ltsc2022
+          BUILD_IMAGE_REF: golang:1.19-nanoserver-ltsc2022
           RUN_IMAGE_REF: mcr.microsoft.com/windows/nanoserver:ltsc2022-amd64
           PLATFORM: windows/amd64
         run: |
