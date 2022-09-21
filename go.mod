@@ -1,6 +1,6 @@
 module docker-mtls-socket-proxy
 
-go 1.17
+go 1.19
 
 require (
 	github.com/Microsoft/go-winio v0.5.1
